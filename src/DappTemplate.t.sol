@@ -2,7 +2,7 @@
 pragma solidity ^0.6.12;
 
 import {DSTest} from "ds-test/test.sol";
-import {DappTemplate} "./DappTemplate.sol";
+import {DappTemplate} from "./DappTemplate.sol";
 
 contract DappTemplateTest is DSTest {
     DappTemplate template;
