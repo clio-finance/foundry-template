@@ -2,21 +2,17 @@
 # (-include to ignore error if it does not exist)-include .env
 -include .env
 
-update:; dapp update
-nodejs-deps:; yarn install
-
 # install solc version
 # example to install other versions: `make solc 0_6_12`
 SOLC_VERSION := 0_6_12
 solc:; nix-env -f https://github.com/dapphub/dapptools/archive/master.tar.gz -iA solc-static-versions.solc_${SOLC_VERSION}
 
-
+clean:; dapp clean
+update:; dapp update
 # Build & test
 build:; dapp build
 test-remote: check-api-key; dapp test --rpc-url $(call alchemy-url,goerli) # --ffi # enable if you need the `ffi` cheat code on HEVM
 test-local:; ETH_RPC_URL='http://localhost:8545' dapp test --rpc  # --ffi # enable if you need the `ffi` cheat code on HEVM
-clean:; dapp clean
-lint:; yarn run lint
 flatten:; hevm flatten --source-file ${file} --json-file out/dapp.sol.json
 
 check-api-key:
@@ -30,3 +26,6 @@ endif
 define alchemy-url
 https://eth-$1.alchemyapi.io/v2/${ALCHEMY_API_KEY}
 endef
+
+nodejs-deps:; yarn install
+lint:; yarn run lint
