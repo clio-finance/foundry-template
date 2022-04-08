@@ -16,7 +16,7 @@ make update
 ### Create a local `.env` file and change the placeholder values
 
 ```bash
-cp .env.examples .env
+cp .env.example .env
 ```
 
 ### Build contracts
