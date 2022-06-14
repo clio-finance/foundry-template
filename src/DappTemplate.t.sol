@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.14;
 
 import {DSTest} from "ds-test/test.sol";
 import {DappTemplate} from "./DappTemplate.sol";
@@ -8,7 +8,7 @@ contract DappTemplateTest is DSTest {
     DappTemplate template;
 
     function setUp() public {
-        template = new DappTemplate();
+        template = new DappTemplate(0, 1);
     }
 
     function testFail_basic_sanity() public {
