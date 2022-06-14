@@ -1,6 +1,6 @@
-# Dapp Template
+# Foundry Template
 
-Template for Smart Contract applications compatible with dapp.tools or foundry.
+Template for Smart Contract applications compatible with [foundry](https://github.com/foundry-rs/foundry).
 
 ## Usage
 
@@ -9,7 +9,7 @@ Template for Smart Contract applications compatible with dapp.tools or foundry.
 ```bash
 # Install tools from the nodejs ecosystem: prettier, solhint, husky and lint-staged
 make nodejs-deps
-# Install smart contract dependencies through `dapp update`
+# Install smart contract dependencies through `foundry update`
 make update
 ```
 
@@ -28,6 +28,7 @@ make build
 ### Test contracts
 
 ```bash
-make test-local # using a local node listening on http://localhost:8545
-make test-remote # using a remote node (alchemy). Requires ALCHEMY_API_KEY env var.
+make test # using a local node listening on http://localhost:8545
+# Or
+ETH_RPC_URL='TH_RPC_URL=https://eth-goerli.alchemyapi.io/v2/<ALCHEMY_API_KEY>' make test # using a remote node (alchemy).
 ```
