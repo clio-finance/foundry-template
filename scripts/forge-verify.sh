@@ -41,15 +41,15 @@ function check-required-etherscan-api-key() {
 
 function usage() {
   cat <<MSG
-verify.sh --address <address> --contract <file>:<contract> [ --constructor-args <abi_encoded_args> ]
+forge-verify.sh --address <address> --contract <file>:<contract> [ --constructor-args <abi_encoded_args> ]
 
 Examples:
 
     # Constructor does not take any arguments
-    verify.sh --address 0xdead...0000  --contract src/MyContract.sol:MyContract
+    forge-verify.sh --address 0xdead...0000  --contract src/MyContract.sol:MyContract
 
     # Constructor takes (uint, address) arguments. Don't forget to abi-encode them!
-    verify.sh 0xdead...0000 src/MyContract.sol:MyContract \\
+    forge-verify.sh 0xdead...0000 src/MyContract.sol:MyContract \\
         --constructor-args="\$(cast abi-encode 'constructor(uint, address)' 1 0x0000000000000000000000000000000000000000)"
 MSG
 }
@@ -65,40 +65,40 @@ if [ "$0" = "$BASH_SOURCE" ]; then
 
   while getopts_long "$optspec" OPT; do
     case "$OPT" in
-    'h' | 'help')
-      echo -e "$(usage)"
-      exit 0
-      ;;
-    'address')
-      [ -z "$OPTARG" ] && {
-        log "\n--address option is missing its argument\n"
+      'h' | 'help')
+        echo -e "$(usage)"
+        exit 0
+        ;;
+      'address')
+        [ -z "$OPTARG" ] && {
+          log "\n--address option is missing its argument\n"
+          die "$(usage)"
+        }
+        address="$OPTARG"
+        ;;
+      'contract')
+        [ -z "$OPTARG" ] && {
+          log "\n--contract option is missing its argument\n"
+          die "$(usage)"
+        }
+        contract="$OPTARG"
+        ;;
+      'constructor-args')
+        [ -z "$OPTARG" ] && {
+          log "\n--constructor-args option is missing its argument\n"
+          die "$(usage)"
+        }
+        constructor_args="$OPTARG"
+        ;;
+      ':')
+        # bad long option
+        log "\nMissing argument for option --${OPTARG}\n"
         die "$(usage)"
-      }
-      address="$OPTARG"
-      ;;
-    'contract')
-      [ -z "$OPTARG" ] && {
-        log "\n--contract option is missing its argument\n"
+        ;;
+      ?)
+        log "\nIllegal option -- ${BOLD}${OPT}${OFF}\n"
         die "$(usage)"
-      }
-      contract="$OPTARG"
-      ;;
-    'constructor-args')
-      [ -z "$OPTARG" ] && {
-        log "\n--constructor-args option is missing its argument\n"
-        die "$(usage)"
-      }
-      constructor_args="$OPTARG"
-      ;;
-    ':')
-      # bad long option
-      log "\nMissing argument for option --${OPTARG}\n"
-      die "$(usage)"
-      ;;
-    ?)
-      log "\nIllegal option -- ${BOLD}${OPT}${OFF}\n"
-      die "$(usage)"
-      ;;
+        ;;
     esac
   done
   shift $((OPTIND - 1))

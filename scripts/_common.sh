@@ -1,21 +1,21 @@
 GREEN='\033[0;32m' # Green
 NC='\033[0m'       # No Color
-function debug() {
+debug() {
   printf '%b\n' "${GREEN}${*}${NC}" >&2
 }
 
-function log() {
+log() {
   echo -e "$@" >&2
 }
 
-function die() {
+die() {
   log "$@"
   exit 1
 }
 
 # Normalizes the environment variables to be fully compatible with dapp.tools
 # @see https://github.com/foundry-rs/foundry/issues/1869
-function normalize-env-vars() {
+normalize-env-vars() {
   local ENV_FILE="${BASH_SOURCE%/*}/../.env"
   [ -f "$ENV_FILE" ] && source "$ENV_FILE"
 
@@ -41,11 +41,11 @@ function normalize-env-vars() {
 }
 
 # Handle reading from the password file
-function extract-password() {
+extract-password() {
   [ -f "$FOUNDRY_ETH_PASSWORD_FILE" ] && cat "$FOUNDRY_ETH_PASSWORD_FILE"
 }
 
-function err-msg-keystore-file() {
+err-msg-keystore-file() {
   cat <<MSG
 ERROR: could not determine the location of the keystore file.
 
@@ -56,8 +56,8 @@ You should either define:
 MSG
 }
 
-function err-msg-etherscan-api-key() {
-    cat <<MSG
+err-msg-etherscan-api-key() {
+  cat <<MSG
 ERROR: cannot verify contracts without ETHERSCAN_API_KEY being set.
 
 You should either:
@@ -68,57 +68,57 @@ MSG
 }
 
 # Shameleslly copied from https://raw.githubusercontent.com/UrsaDK/getopts_long/master/lib/getopts_long.bash
-function getopts_long() {
-    : "${1:?Missing required parameter -- long optspec}"
-    : "${2:?Missing required parameter -- variable name}"
+getopts_long() {
+  : "${1:?Missing required parameter -- long optspec}"
+  : "${2:?Missing required parameter -- variable name}"
 
-    local optspec_short="${1%% *}-:"
-    local optspec_long="${1#* }"
-    local optvar="${2}"
+  local optspec_short="${1%% *}-:"
+  local optspec_long="${1#* }"
+  local optvar="${2}"
 
-    shift 2
+  shift 2
 
-    if [[ "${#}" == 0 ]]; then
-        local args=()
-        while [[ ${#BASH_ARGV[@]} -gt ${#args[@]} ]]; do
-            local index=$(( ${#BASH_ARGV[@]} - ${#args[@]} - 1 ))
-            args[${#args[@]}]="${BASH_ARGV[${index}]}"
-        done
-        set -- "${args[@]}"
+  if [[ "${#}" == 0 ]]; then
+    local args=()
+    while [[ ${#BASH_ARGV[@]} -gt ${#args[@]} ]]; do
+      local index=$((${#BASH_ARGV[@]} - ${#args[@]} - 1))
+      args[${#args[@]}]="${BASH_ARGV[${index}]}"
+    done
+    set -- "${args[@]}"
+  fi
+
+  builtin getopts "${optspec_short}" "${optvar}" "${@}" || return 1
+  [[ "${!optvar}" == '-' ]] || return 0
+
+  printf -v "${optvar}" "%s" "${OPTARG%%=*}"
+
+  if [[ "${optspec_long}" =~ (^|[[:space:]])${!optvar}:([[:space:]]|$) ]]; then
+    OPTARG="${OPTARG#${!optvar}}"
+    OPTARG="${OPTARG#=}"
+
+    # Missing argument
+    if [[ -z "${OPTARG}" ]]; then
+      OPTARG="${!OPTIND}" && OPTIND=$((OPTIND + 1))
+      [[ -z "${OPTARG}" ]] || return 0
+
+      if [[ "${optspec_short:0:1}" == ':' ]]; then
+        OPTARG="${!optvar}" && printf -v "${optvar}" ':'
+      else
+        [[ "${OPTERR}" == 0 ]] ||
+          echo "${0}: option requires an argument -- ${!optvar}" >&2
+        unset OPTARG && printf -v "${optvar}" '?'
+      fi
     fi
-
-    builtin getopts "${optspec_short}" "${optvar}" "${@}" || return 1
-    [[ "${!optvar}" == '-' ]] || return 0
-
-    printf -v "${optvar}" "%s" "${OPTARG%%=*}"
-
-    if [[ "${optspec_long}" =~ (^|[[:space:]])${!optvar}:([[:space:]]|$) ]]; then
-        OPTARG="${OPTARG#${!optvar}}"
-        OPTARG="${OPTARG#=}"
-
-        # Missing argument
-        if [[ -z "${OPTARG}" ]]; then
-            OPTARG="${!OPTIND}" && OPTIND=$(( OPTIND + 1 ))
-            [[ -z "${OPTARG}" ]] || return 0
-
-            if [[ "${optspec_short:0:1}" == ':' ]]; then
-                OPTARG="${!optvar}" && printf -v "${optvar}" ':'
-            else
-                [[ "${OPTERR}" == 0 ]] || \
-                    echo "${0}: option requires an argument -- ${!optvar}" >&2
-                unset OPTARG && printf -v "${optvar}" '?'
-            fi
-        fi
-    elif [[ "${optspec_long}" =~ (^|[[:space:]])${!optvar}([[:space:]]|$) ]]; then
-        unset OPTARG
+  elif [[ "${optspec_long}" =~ (^|[[:space:]])${!optvar}([[:space:]]|$) ]]; then
+    unset OPTARG
+  else
+    # Invalid option
+    if [[ "${optspec_short:0:1}" == ':' ]]; then
+      OPTARG="${!optvar}"
     else
-        # Invalid option
-        if [[ "${optspec_short:0:1}" == ':' ]]; then
-            OPTARG="${!optvar}"
-        else
-            [[ "${OPTERR}" == 0 ]] || echo "${0}: illegal option -- ${!optvar}" >&2
-            unset OPTARG
-        fi
-        printf -v "${optvar}" '?'
+      [[ "${OPTERR}" == 0 ]] || echo "${0}: illegal option -- ${!optvar}" >&2
+      unset OPTARG
     fi
+    printf -v "${optvar}" '?'
+  fi
 }

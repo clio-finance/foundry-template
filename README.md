@@ -30,5 +30,10 @@ make build
 ```bash
 make test # using a local node listening on http://localhost:8545
 # Or
-ETH_RPC_URL='TH_RPC_URL=https://eth-goerli.alchemyapi.io/v2/<ALCHEMY_API_KEY>' make test # using a remote node (alchemy).
+ETH_RPC_URL='https://eth-goerli.alchemyapi.io/v2/<ALCHEMY_API_KEY>' make test # using a remote node
 ```
+
+### Edit as needed
+
+- Put contracts and tests in `src/`
+- Modify the `Makefile` targets accordingly

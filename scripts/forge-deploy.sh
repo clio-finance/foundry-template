@@ -3,10 +3,10 @@ set -eo pipefail
 
 source "${BASH_SOURCE%/*}/_common.sh"
 
-function deploy() {
+deploy() {
   normalize-env-vars
 
-  local PASSWORD=$(extract-password)
+  local PASSWORD="$(extract-password)"
   if [ -n "$PASSWORD" ]; then
     PASSWORD_OPT="--password=${PASSWORD}"
   fi
@@ -14,11 +14,11 @@ function deploy() {
   check-required-etherscan-api-key
 
   # Log the command being issued, making sure not to expose the password
-  log "forge create --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" $(sed 's/=.*$/=[REDACTED]/' <<<${PASSWORD_OPT}) $@"
+  log "forge create --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" $(sed 's/=.*$/=[REDACTED]/' <<<"${PASSWORD_OPT}") $@"
   forge create --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" ${PASSWORD_OPT} $@
 }
 
-function check-required-etherscan-api-key() {
+check-required-etherscan-api-key() {
   # Require the Etherscan API Key if --verify option is enabled
   set +e
   if grep -- '--verify' <<<"$@" >/dev/null; then
@@ -27,17 +27,17 @@ function check-required-etherscan-api-key() {
   set -e
 }
 
-function usage() {
+usage() {
   cat <<MSG
-deploy.sh --contract <file>:<contract> [ --verify ] [ --constructor-args ...args ]
+forge-deploy.sh --contract <file>:<contract> [ --verify ] [ --constructor-args ...args ]
 
 Examples:
 
     # Constructor does not take any arguments
-    deploy.sh src/MyContract.sol:MyContract --verify
+    forge-deploy.sh src/MyContract.sol:MyContract --verify
 
     # Constructor takes (uint, address) arguments
-    deploy.sh src/MyContract.sol:MyContract --verify --constructor-args 1 0x0000000000000000000000000000000000000000
+    forge-deploy.sh src/MyContract.sol:MyContract --verify --constructor-args 1 0x0000000000000000000000000000000000000000
 MSG
 }
 
@@ -50,34 +50,34 @@ if [ "$0" = "$BASH_SOURCE" ]; then
 
   while getopts_long "$optspec" OPT; do
     case "$OPT" in
-    'h' | 'help')
-      echo -e "$(usage)"
-      exit 0
-      ;;
-    'contract')
-      [ -z "$OPTARG" ] && {
-        log "\n--contract option is missing its argument\n"
+      'h' | 'help')
+        echo -e "$(usage)"
+        exit 0
+        ;;
+      'contract')
+        [ -z "$OPTARG" ] && {
+          log "\n--contract option is missing its argument\n"
+          die "$(usage)"
+        }
+        contract="$OPTARG"
+        ;;
+      'verify')
+        should_verify=1
+        ;;
+      'constructor-args')
+        has_constructor_args=1
+        # Constructor args must be the last arguments
+        break
+        ;;
+      ':')
+        # bad long option
+        log "\nMissing argument for option --${OPTARG}\n"
         die "$(usage)"
-      }
-      contract="$OPTARG"
-      ;;
-    'verify')
-      should_verify=1
-      ;;
-    'constructor-args')
-      has_constructor_args=1
-      # Constructor args must be the last arguments
-      break
-      ;;
-    ':')
-      # bad long option
-      log "\nMissing argument for option --${OPTARG}\n"
-      die "$(usage)"
-      ;;
-    ?)
-      log "\nIllegal option -- ${BOLD}${OPT}${OFF}\n"
-      die "$(usage)"
-      ;;
+        ;;
+      ?)
+        log "\nIllegal option -- ${BOLD}${OPT}${OFF}\n"
+        die "$(usage)"
+        ;;
     esac
   done
   shift $((OPTIND - 1))
@@ -95,5 +95,4 @@ if [ "$0" = "$BASH_SOURCE" ]; then
   else
     deploy "$contract" "${args[@]}" --constructor-args "$@"
   fi
-
 fi
