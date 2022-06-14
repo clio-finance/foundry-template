@@ -11,11 +11,11 @@ contract DappTemplateTest is Test {
         template = new DappTemplate();
     }
 
-    function testFail_basic_sanity() public {
+    function testFailBasicSanity() public {
         assertTrue(false);
     }
 
-    function test_basic_sanity() public {
+    function testBasicSanity() public {
         assertTrue(true);
     }
 }
