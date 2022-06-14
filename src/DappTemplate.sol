@@ -2,5 +2,5 @@
 pragma solidity ^0.8.14;
 
 contract DappTemplate {
-  constructor(uint256 a, uint256 b) {}
+  constructor() {}
 }

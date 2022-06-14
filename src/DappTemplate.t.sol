@@ -8,7 +8,7 @@ contract DappTemplateTest is DSTest {
     DappTemplate template;
 
     function setUp() public {
-        template = new DappTemplate(0, 1);
+        template = new DappTemplate();
     }
 
     function testFail_basic_sanity() public {
