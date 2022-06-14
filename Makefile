@@ -11,7 +11,7 @@ clean:; forge clean
 update:; forge update
 # Build & test
 build:; forge build
-test:; forge test --rpc # --ffi # enable if you need the `ffi` cheat code on HEVM
+test:; forge test # --ffi # enable if you need the `ffi` cheat code on HEVM
 
 flatten:; forge flatten --source-file src/DappTemplate.sol
 
