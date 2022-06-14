@@ -5,17 +5,17 @@ import "forge-std/Test.sol";
 import {DappTemplate} from "./DappTemplate.sol";
 
 contract DappTemplateTest is Test {
-    DappTemplate template;
+  DappTemplate template;
 
-    function setUp() public {
-        template = new DappTemplate();
-    }
+  function setUp() public {
+    template = new DappTemplate();
+  }
 
-    function testFailBasicSanity() public {
-        assertTrue(false);
-    }
+  function testFailBasicSanity() public {
+    assertTrue(false);
+  }
 
-    function testBasicSanity() public {
-        assertTrue(true);
-    }
+  function testBasicSanity() public {
+    assertTrue(true);
+  }
 }

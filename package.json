@@ -4,21 +4,23 @@
   "main": "index.js",
   "repository": "git@github.com:clio-finance/foundry-template.git",
   "author": "Clio Finance <ops@clio.finance>",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "prepare": "husky install",
     "prepublishOnly": "copyfiles -u 1 \"./src/**/*.sol\" ./",
     "postpublish": "rimraf ./*.sol",
-    "prepack": "yarn prepublishOnly",
-    "postpack": "yarn postpublish",
+    "prepack": "run-s prepublishOnly",
+    "postpack": "run-s postpublish",
     "lint": "run-s solhint prettier",
     "lint:check": "run-s prettier:check solhint:check",
-    "prettier": "yarn prettier:check --write",
+    "prettier": "run-s 'prettier:check --write'",
     "prettier:check": "prettier --check \"src/**/*.sol\"",
-    "solhint": "yarn solhint:check --fix",
+    "solhint": "run-s 'solhint:check --fix'",
     "solhint:check": "solhint --config ./.solhint.json \"src/**/*.sol\""
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.0.2",
+    "@commitlint/config-conventional": "^17.0.2",
     "copyfiles": "^2.4.1",
     "husky": ">=6",
     "lint-staged": ">=10",
@@ -32,5 +34,10 @@
   "lint-staged": {
     "*.{js,css,md,sol}": "prettier --write",
     "*.{sh}": "shfmt --write"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   }
 }
