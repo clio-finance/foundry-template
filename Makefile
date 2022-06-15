@@ -15,10 +15,9 @@ test:; forge test # --ffi # enable if you need the `ffi` cheat code on HEVM
 
 flatten:; forge flatten --source-file src/DappTemplate.sol
 
- # Constructor args must come last
-deploy:; @scripts/forge-deploy.sh --verify --contract=src/DappTemplate.sol:DappTemplate # --constructor-args 0 1
- # Differently than deploy, this requires abi-encoded constructor arguments
-verify:; @scripts/forge-verify.sh --address=${address} --contract=src/DappTemplate.sol:DappTemplate # --constructor-args `cast abi-encode 'x(uint, address)' arg1 arg2`
+deploy:; @scripts/forge-deploy.sh src/DappTemplate.sol:DappTemplate --verify
+verify:; @scripts/forge-verify.sh ${address} src/DappTemplate.sol:DappTemplate
+send:; @scripts/cast-send.sh ${args}
 
 nodejs-deps:; yarn install
 lint:; yarn run lint
