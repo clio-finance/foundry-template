@@ -13,16 +13,18 @@ deploy() {
 
   check-required-etherscan-api-key
 
-  local OUTPUT=
+  # Remove the --json flag if passed because it is always passed below
+  local ARGS="$(sed -r 's/\s*--json\b//' <<<"$@")"
+  local RESPONSE=
   # Log the command being issued, making sure not to expose the password
-  log "forge create --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" $(sed 's/=.*$/=[REDACTED]/' <<<"${PASSWORD_OPT}") ${@}"
+  log "forge create --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" $(sed 's/=.*$/=[REDACTED]/' <<<"$PASSWORD_OPT") --json $ARGS"
   # Currently `forge create` send the logs to stdout instead of stderr.
   # This makes it hard to compose its output with other commands, so here we are:
   # 1. Duplicating stdout to stderr through `tee`
   # 2. Extracting only the address of the deployed contract to stdout
-  OUTPUT=$(forge create --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" ${PASSWORD_OPT} "$@" | tee >(cat 1>&2))
+  RESPONSE=$(forge create --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" "$PASSWORD_OPT" --json $ARGS | tee >(cat 1>&2))
 
-  grep -i 'deployed to:' <<<"$OUTPUT" | awk -F: '{ print $2 }' | tr -d '\s'
+  jq -Rr 'fromjson? | .deployedTo' <<<"$RESPONSE"
 }
 
 check-required-etherscan-api-key() {
