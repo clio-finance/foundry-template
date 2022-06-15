@@ -16,6 +16,10 @@ deploy() {
   local OUTPUT=
   # Log the command being issued, making sure not to expose the password
   log "forge create --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" $(sed 's/=.*$/=[REDACTED]/' <<<"${PASSWORD_OPT}") ${@}"
+  # Currently `forge create` send the logs to stdout instead of stderr.
+  # This makes it hard to compose its output with other commands, so here we are:
+  # 1. Duplicating stdout to stderr through `tee`
+  # 2. Extracting only the address of the deployed contract to stdout
   OUTPUT=$(forge create --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" ${PASSWORD_OPT} "$@" | tee >(cat 1>&2))
 
   grep -i 'deployed to:' <<<"$OUTPUT" | awk -F: '{ print $2 }' | tr -d '\s'
