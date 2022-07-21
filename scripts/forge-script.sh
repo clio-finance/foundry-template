@@ -3,7 +3,7 @@ set -eo pipefail
 
 source "${BASH_SOURCE%/*}/_common.sh"
 
-deploy() {
+run_script() {
   normalize-env-vars
 
   local PASSWORD="$(extract-password)"
@@ -16,14 +16,14 @@ deploy() {
 
   local RESPONSE=
   # Log the command being issued, making sure not to expose the password
-  log "forge create --json --gas-limit $FOUNDRY_GAS_LIMIT --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" $(sed 's/ .*$/ [REDACTED]/' <<<"${PASSWORD_OPT[@]}")" $(printf ' %q' "$@")
+  log "forge script --json --gas-limit $FOUNDRY_GAS_LIMIT --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" $(sed 's/ .*$/ [REDACTED]/' <<<"${PASSWORD_OPT[@]}")" $(printf ' %q' "$@")
   # Currently `forge create` sends the logs to stdout instead of stderr.
   # This makes it hard to compose its output with other commands, so here we are:
   # 1. Duplicating stdout to stderr through `tee`
   # 2. Extracting only the address of the deployed contract to stdout
-  RESPONSE=$(forge create --json --gas-limit $FOUNDRY_GAS_LIMIT --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" "${PASSWORD_OPT[@]}" "$@" | tee >(cat 1>&2))
+  RESPONSE=$(forge script --json --gas-limit $FOUNDRY_GAS_LIMIT --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" "${PASSWORD_OPT[@]}" "$@" | tee >(cat 1>&2))
 
-  jq -Rr 'fromjson? | .deployedTo' <<<"$RESPONSE"
+  echo "\n\n--------\n\n" $RESPONSE
 }
 
 check-required-etherscan-api-key() {
@@ -37,15 +37,13 @@ check-required-etherscan-api-key() {
 
 usage() {
   cat <<MSG
-forge-deploy.sh [<file>:]<contract> [ --verify ] [ --constructor-args ...args ]
+forge-script.sh <file>[:<contract>] [ --target-contract <contract> ] [ --sig <signature> ] [ --verify ]
 
 Examples:
 
-    # Constructor does not take any arguments
-    forge-deploy.sh src/MyContract.sol:MyContract --verify
+    forge-script.sh src/MyContract.sol:MyContract --verify
 
-    # Constructor takes (uint, address) arguments
-    forge-deploy.sh src/MyContract.sol:MyContract --verify --constructor-args 1 0x0000000000000000000000000000000000000000
+    forge-script.sh src/MyContract.sol --target-contract MyContract --sig 'deploy()' --verify
 MSG
 }
 
@@ -55,5 +53,5 @@ if [ "$0" = "$BASH_SOURCE" ]; then
     exit 0
   }
 
-  deploy "$@"
+  run_script "$@"
 fi

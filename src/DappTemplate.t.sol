@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import {DappTemplate} from "./DappTemplate.sol";
 
 contract DappTemplateTest is Test {
-  DappTemplate template;
+  DappTemplate internal template;
 
   function setUp() public {
     template = new DappTemplate();
