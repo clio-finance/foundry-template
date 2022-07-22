@@ -16,14 +16,14 @@ run_script() {
 
   local RESPONSE=
   # Log the command being issued, making sure not to expose the password
-  log "forge script --json --gas-limit $FOUNDRY_GAS_LIMIT --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" $(sed 's/ .*$/ [REDACTED]/' <<<"${PASSWORD_OPT[@]}")" $(printf ' %q' "$@")
+  log "forge script --json --gas-limit $FOUNDRY_GAS_LIMIT --sender "$FOUNDRY_ETH_FROM" --keystore "$FOUNDRY_ETH_KEYSTORE_FILE" $(sed 's/ .*$/ [REDACTED]/' <<<"${PASSWORD_OPT[@]}")" $(printf ' %q' "$@")
   # Currently `forge create` sends the logs to stdout instead of stderr.
   # This makes it hard to compose its output with other commands, so here we are:
   # 1. Duplicating stdout to stderr through `tee`
   # 2. Extracting only the address of the deployed contract to stdout
-  RESPONSE=$(forge script --json --gas-limit $FOUNDRY_GAS_LIMIT --keystore="$FOUNDRY_ETH_KEYSTORE_FILE" "${PASSWORD_OPT[@]}" "$@" | tee >(cat 1>&2))
+  RESPONSE=$(forge script --json --gas-limit $FOUNDRY_GAS_LIMIT --sender "$FOUNDRY_ETH_FROM" --keystores "$FOUNDRY_ETH_KEYSTORE_FILE" "${PASSWORD_OPT[@]}" "$@" | tee >(cat 1>&2))
 
-  echo "\n\n--------\n\n" $RESPONSE
+  jq -Rr 'fromjson?' <<<"$RESPONSE"
 }
 
 check-required-etherscan-api-key() {
@@ -37,13 +37,20 @@ check-required-etherscan-api-key() {
 
 usage() {
   cat <<MSG
-forge-script.sh <file>[:<contract>] [ --target-contract <contract> ] [ --sig <signature> ] [ --verify ]
+forge-script.sh [<file>:]<contract> [ --fork-url RPC_URL --broadcast ] [ --sig <signature> ] [ --verify ]
 
 Examples:
+    # Simulate running the script
+    forge-script.sh MyContract
 
-    forge-script.sh src/MyContract.sol:MyContract --verify
+    # Simulate running the script in a fork
+    forge-script.sh MyContract --fork-url http://localhost:8545
 
-    forge-script.sh src/MyContract.sol --target-contract MyContract --sig 'deploy()' --verify
+    # Broadcast a transaction to the network
+    forge-script.sh MyContract --fork-url http://localhost:8545 --broadcast
+
+    # Call a different method in the contract
+    forge-script.sh MyContract --sig 'deploy()'
 MSG
 }
 
