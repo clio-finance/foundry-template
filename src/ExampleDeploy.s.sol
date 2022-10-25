@@ -6,13 +6,13 @@ import "forge-std/Script.sol";
 import {Example} from "./Example.sol";
 
 contract ExampleDeploy is Script {
-  function run() external returns (Example) {
-    vm.startBroadcast();
+    function run() external returns (Example) {
+        vm.startBroadcast();
 
-    Example tpl = new Example(1);
+        Example tpl = new Example(1);
 
-    vm.stopBroadcast();
+        vm.stopBroadcast();
 
-    return tpl;
-  }
+        return tpl;
+    }
 }

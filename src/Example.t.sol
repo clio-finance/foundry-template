@@ -6,17 +6,17 @@ import "forge-std/Test.sol";
 import {Example} from "./Example.sol";
 
 contract ExampleTest is Test {
-  Example internal template;
+    Example internal template;
 
-  function setUp() public {
-    template = new Example(0);
-  }
+    function setUp() public {
+        template = new Example(0);
+    }
 
-  function testFailBasicSanity() public {
-    assertTrue(false);
-  }
+    function testFailBasicSanity() public {
+        assertTrue(false);
+    }
 
-  function testBasicSanity() public {
-    assertTrue(true);
-  }
+    function testBasicSanity() public {
+        assertTrue(true);
+    }
 }

@@ -3,9 +3,9 @@
 pragma solidity ^0.8.14;
 
 contract Example {
-  uint256 public immutable a;
+    uint256 public immutable a;
 
-  constructor(uint256 a_) {
-    a = a_;
-  }
+    constructor(uint256 a_) {
+        a = a_;
+    }
 }
