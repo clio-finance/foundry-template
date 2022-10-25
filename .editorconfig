@@ -4,13 +4,19 @@
 root = true
 
 [*]
-# Unix-style newlines with a newline ending every file
+charset = utf-8
 end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 charset = utf-8
 
-# Tab indentation (no size specified)
-[Makefile]
-indent_style = tab
+[*.{diff,md}]
+trim_trailing_whitespace = false
+
+[{package.json,.travis.yml}]
+indent_style = space
+indent_size = 2
+
+[foundry.toml]
+indent_style = space
 indent_size = 4
