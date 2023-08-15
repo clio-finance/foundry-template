@@ -2,8 +2,8 @@
   "name": "foundry-template",
   "version": "0.1.0",
   "main": "index.js",
-  "repository": "git@github.com:clio-finance/foundry-template.git",
-  "author": "Clio Finance <ops@clio.finance>",
+  "repository": "git@github.com:dewiz-xyz/foundry-template.git",
+  "author": "Dewiz Team<team@mail.dewiz.xyz>",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "prepare": "husky install",
@@ -16,7 +16,7 @@
     "prettier": "run-s 'prettier:check --write'",
     "prettier:check": "prettier --check \"src/**/*.sol\"",
     "solhint": "run-s 'solhint:check --fix'",
-    "solhint:check": "solhint --config ./.solhint.json \"src/**/*.sol\""
+    "solhint:check": "solhint \"src/**/*.sol\""
   },
   "devDependencies": {
     "@commitlint/cli": "^17.0.2",
@@ -32,8 +32,7 @@
     "solhint-plugin-prettier": "^0.0.5"
   },
   "lint-staged": {
-    "*.{js,css,md,sol}": "prettier --write",
-    "*.sh": "shfmt --write"
+    "*.{js,css,md,sol}": "prettier --write"
   },
   "commitlint": {
     "extends": [
